@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>神秘塔罗 - AI 占卜大师</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a0000 0%, #3d0000 50%, #1a0000 100%);
+            min-height: 100vh;
+            color: #ffcccc;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* 星空背景 */
+        .starfield {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+            animation: twinkle 3s infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        /* 红色光晕效果 */
+        .glow-orb {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(230, 57, 70, 0.3) 0%, transparent 70%);
+            filter: blur(40px);
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .glow-orb:nth-child(1) {
+            width: 300px;
+            height: 300px;
+            top: -100px;
+            right: -50px;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .glow-orb:nth-child(2) {
+            width: 400px;
+            height: 400px;
+            bottom: -150px;
+            left: -100px;
+            animation: float 8s ease-in-out infinite reverse;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(30px, 30px); }
+        }
+
+        .container {
+            position: relative;
+            z-index: 10;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* 标题 */
+        h1 {
+            font-size: 3em;
+            text-align: center;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #e63946 0%, #ff6b6b 50%, #e63946 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 20px rgba(230, 57, 70, 0.3);
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 1.2em;
+            margin-bottom: 40px;
+            color: #ffaaaa;
+            font-style: italic;
+        }
+
+        /* 输入区域 */
+        .input-section {
+            background: rgba(60, 0, 0, 0.6);
+            border: 2px solid #e63946;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 40px;
+            max-width: 600px;
+            width: 100%;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(230, 57, 70, 0.2), inset 0 1px 1px rgba(230, 57, 70, 0.1);
+        }
+
+        .input-label {
+            display: block;
+            font-size: 1.1em;
+            margin-bottom: 15px;
+            color: #e63946;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid #e63946;
+            border-radius: 8px;
+            color: #ffcccc;
+            font-size: 1em;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]::placeholder {
+            color: rgba(255, 204, 204, 0.5);
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            background: rgba(230, 57, 70, 0.1);
+            border-color: #ff6b6b;
+            box-shadow: 0 0 15px rgba(230, 57, 70, 0.3);
+        }
+
+        /* 按钮 */
+        .btn-start {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #e63946 0%, #ff6b6b 50%, #e63946 100%);
+            color: #1a0000;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(230, 57, 70, 0.3);
+            letter-spacing: 1px;
+        }
+
+        .btn-start:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(230, 57, 70, 0.5);
+            background: linear-gradient(135deg, #ff6b6b 0%, #e63946 50%, #ff6b6b 100%);
+        }
+
+        .btn-start:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        .btn-start:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* 塔罗牌容器 */
+        .cards-container {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 40px 0;
+            flex-wrap: wrap;
+            min-height: 300px;
+        }
+
+        /* 塔罗牌 */
+        .tarot-card {
+            width: 120px;
+            height: 200px;
+            perspective: 1000px;
+            cursor: pointer;
+        }
+
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+
+        .tarot-card.flipped .card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+            font-weight: bold;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+            border: 2px solid #e63946;
+        }
+
+        .card-back {
+            background: linear-gradient(135deg, #7f1a1a 0%, #8b2e2e 50%, #7f1a1a 100%);
+            background-image:
+                repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(230, 57, 70, 0.15) 35px, rgba(230, 57, 70, 0.15) 70px),
+                repeating-linear-gradient(-45deg, transparent, transparent 35px, rgba(230, 57, 70, 0.15) 35px, rgba(230, 57, 70, 0.15) 70px);
+            color: #e63946;
+            text-shadow: 0 0 10px rgba(230, 57, 70, 0.5);
+        }
+
+        .card-front {
+            background: linear-gradient(135deg, #ffcccc 0%, #e63946 50%, #c0392b 100%);
+            transform: rotateY(180deg);
+            color: #1a0000;
+            font-size: 3em;
+        }
+
+        .card-front.reversed {
+            transform: rotateY(180deg) rotateZ(180deg);
+        }
+
+        /* 结果区域 */
+        .result-section {
+            background: rgba(60, 0, 0, 0.6);
+            border: 2px solid #e63946;
+            border-radius: 15px;
+            padding: 40px;
+            max-width: 700px;
+            width: 100%;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(230, 57, 70, 0.2);
+            display: none;
+            animation: fadeIn 0.8s ease-in;
+        }
+
+        .result-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-title {
+            font-size: 1.5em;
+            color: #e63946;
+            margin-bottom: 20px;
+            font-weight: bold;
+            border-bottom: 2px solid #e63946;
+            padding-bottom: 15px;
+        }
+
+        .result-content {
+            line-height: 1.8;
+            color: #ffcccc;
+            margin-bottom: 20px;
+        }
+
+        .card-info {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 3px solid #e63946;
+        }
+
+        .card-name {
+            color: #e63946;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .btn-reset {
+            margin-top: 20px;
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #e63946 0%, #ff6b6b 50%, #e63946 100%);
+            color: #1a0000;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(230, 57, 70, 0.3);
+        }
+
+        .btn-reset:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(230, 57, 70, 0.5);
+        }
+
+        /* 加载动画 */
+        .loading {
+            text-align: center;
+            color: #e63946;
+            font-size: 1.2em;
+            margin: 30px 0;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(230, 57, 70, 0.3);
+            border-top: 4px solid #e63946;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+            }
+
+            .subtitle {
+                font-size: 1em;
+            }
+
+            .cards-container {
+                gap: 15px;
+            }
+
+            .tarot-card {
+                width: 90px;
+                height: 150px;
+            }
+
+            .card-front {
+                font-size: 2em;
+            }
+
+            .input-section {
+                padding: 20px;
+            }
+
+            .result-section {
+                padding: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.5em;
+            }
+
+            .subtitle {
+                font-size: 0.9em;
+                margin-bottom: 20px;
+            }
+
+            .cards-container {
+                gap: 10px;
+            }
+
+            .tarot-card {
+                width: 70px;
+                height: 120px;
+            }
+
+            .card-back, .card-front {
+                font-size: 1.5em;
+                border-radius: 5px;
+            }
+
+            input[type="text"] {
+                font-size: 0.9em;
+                padding: 10px;
+            }
+
+            .btn-start {
+                font-size: 1em;
+                padding: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 星空背景 -->
+    <div class="starfield" id="starfield"></div>
+
+    <!-- 红色光晕 -->
+    <div class="glow-orb"></div>
+    <div class="glow-orb"></div>
+
+    <div class="container">
+        <h1>✨ 塔 罗 ✨</h1>
+        <p class="subtitle">与宇宙对话，探索命运的答案</p>
+
+        <!-- 输入区域 -->
+        <div class="input-section">
+            <label class="input-label">请输入您的问题：</label>
+            <input type="text" id="question" placeholder="例如：我最近的事业运如何？" maxlength="100">
+            <button class="btn-start" id="startBtn">开始占卜</button>
+        </div>
+
+        <!-- 塔罗牌区域 -->
+        <div class="cards-container" id="cardsContainer"></div>
+
+        <!-- 结果区域 -->
+        <div class="result-section" id="resultSection">
+            <div class="result-title">占卜解读</div>
+            <div class="result-content" id="resultContent"></div>
+            <button class="btn-reset" id="resetBtn">重新占卜</button>
+        </div>
+    </div>
+
+    <script>
+        // 塔罗牌数据库
+        const TAROT_DECK = [
+            { name: '愚者', emoji: '🚶', meaning: '开始、冒险、自由' },
+            { name: '魔术师', emoji: '🎭', meaning: '创意、力量、自我实现' },
+            { name: '女祭司', emoji: '📖', meaning: '直觉、秘密、内在智慧' },
+            { name: '皇后', emoji: '👑', meaning: '丰盛、美丽、创意能量' },
+            { name: '皇帝', emoji: '🏰', meaning: '权力、领导、稳定' },
+            { name: '教皇', emoji: '⛪', meaning: '传统、信仰、精神指导' },
+            { name: '恋人', emoji: '💑', meaning: '爱、选择、和谐' },
+            { name: '战车', emoji: '🐴', meaning: '决心、克服、前进' },
+            { name: '力量', emoji: '💪', meaning: '内在力量、耐心、自控' },
+            { name: '隐士', emoji: '🕯️', meaning: '内省、智慧、引导' },
+            { name: '命运之轮', emoji: '🎡', meaning: '好运、周期、命运' },
+            { name: '正义', emoji: '⚖️', meaning: '平衡、真理、业力' },
+            { name: '吊人', emoji: '🔄', meaning: '放手、等待、新视角' },
+            { name: '死神', emoji: '💀', meaning: '转变、结束、新生' },
+            { name: '节制', emoji: '⚗️', meaning: '平衡、自制、和谐' },
+            { name: '魔鬼', emoji: '😈', meaning: '束缚、物质、欲望' },
+            { name: '高塔', emoji: '🌩️', meaning: '混乱、破坏、启示' },
+            { name: '星星', emoji: '⭐', meaning: '希望、梦想、灵感' },
+            { name: '月亮', emoji: '🌙', meaning: '幻想、恐惧、无意识' },
+            { name: '太阳', emoji: '☀️', meaning: '成功、快乐、光明' },
+            { name: '审判', emoji: '⏰', meaning: '觉醒、复兴、决定' },
+            { name: '世界', emoji: '🌍', meaning: '完成、圆满、统一' }
+        ];
+
+        // AI 占卜解读文本库（将动态生成）
+        const DIVINATION_TEMPLATES = {
+            positive: [
+                '此牌表明您正处于积极的周期。这段时间充满机遇，宇宙在引导您向前。相信您的直觉，坚定前行，成功近在眼前。',
+                '吉兆出现。这张牌预示着光明的前景。您的努力将得到回报，持续的坚持会带来丰硕的成果。',
+                '这是一张充满能量的牌。它提示您拥有内在的力量去实现目标。现在是采取行动的好时机。'
+            ],
+            negative: [
+                '这张牌提醒您需要谨慎。虽然暂时面临挑战，但困难往往是成长的机会。保持耐心，相信一切都在改变。',
+                '此牌表示您可能需要重新审视您的方向。反思过去，调整策略，困难将逐渐消散。',
+                '这个警示要求您放下执着。有时候放手是获得自由的唯一方式。相信更好的事物正在路上。'
+            ],
+            neutral: [
+                '此牌象征转变与平衡。变化正在酝酿，您需要保持灵活。接受当下的节奏，顺应自然之力。',
+                '这张牌提示您处于过渡阶段。等待与观察同样重要。准备好迎接即将到来的新机遇。',
+                '平衡与和谐是这张牌的核心。您需要在工作与休息间找到平衡点。倾听内在的声音。'
+            ]
+        };
+
+        let selectedCards = [];
+
+        // 生成星空背景
+        function generateStars() {
+            const starfield = document.getElementById('starfield');
+            for (let i = 0; i < 100; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.width = Math.random() * 2 + 1 + 'px';
+                star.style.height = star.style.width;
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDelay = Math.random() * 3 + 's';
+                starfield.appendChild(star);
+            }
+        }
+
+        // 创建塔罗牌元素
+        function createCard(index) {
+            const card = document.createElement('div');
+            card.className = 'tarot-card';
+            card.dataset.index = index;
+            card.innerHTML = `
+                <div class="card-inner">
+                    <div class="card-face card-back">🃏</div>
+                    <div class="card-face card-front">?</div>
+                </div>
+            `;
+            return card;
+        }
+
+        // 从牌库中随机抽取3张牌
+        function drawCards() {
+            const shuffled = [...TAROT_DECK].sort(() => Math.random() - 0.5);
+            return shuffled.slice(0, 3).map(card => ({
+                ...card,
+                reversed: Math.random() > 0.5
+            }));
+        }
+
+        // 翻牌动画
+        function flipCard(cardElement, cardData, delay) {
+            return new Promise(resolve => {
+                setTimeout(() => {
+                    cardElement.classList.add('flipped');
+                    const cardFront = cardElement.querySelector('.card-front');
+                    cardFront.textContent = cardData.emoji;
+                    if (cardData.reversed) {
+                        cardFront.classList.add('reversed');
+                    }
+
+                    // 翻牌音效（可选）
+                    playFlipSound();
+
+                    resolve();
+                }, delay);
+            });
+        }
+
+        // 播放翻牌音效（简单的音频生成）
+        function playFlipSound() {
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+
+                oscillator.frequency.value = 800;
+                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.1);
+            } catch (e) {
+                // 音频不可用，静默处理
+            }
+        }
+
+        // 生成 AI 占卜解读
+        function generateDivination(cards, question) {
+            const reversedCount = cards.filter(c => c.reversed).length;
+            const sentiment = reversedCount === 0 ? 'positive' : reversedCount === 3 ? 'negative' : 'neutral';
+
+            const templates = DIVINATION_TEMPLATES[sentiment];
+            const mainReading = templates[Math.floor(Math.random() * templates.length)];
+
+            let reading = `<div style="margin-bottom: 25px;">
+                <strong>您的问题：</strong> "${question}"
+                <br><br>
+                ${mainReading}
+            </div>`;
+
+            reading += '<div style="margin-top: 20px;"><strong>牌卡解析：</strong></div>';
+
+            cards.forEach((card, index) => {
+                const position = ['过去', '现在', '未来'][index];
+                const status = card.reversed ? '(逆位)' : '(正位)';
+                reading += `
+                    <div class="card-info">
+                        <div class="card-name">${position} - ${card.name} ${status}</div>
+                        <div>${card.emoji} ${card.meaning}</div>
+                        ${card.reversed ? '<div style="color: #ff9999; margin-top: 8px;">⚠️ 逆位含义：挑战、阻碍或需要调整</div>' : ''}
+                    </div>
+                `;
+            });
+
+            return reading;
+        }
+
+        // 开始占卜
+        async function startDivination() {
+            const question = document.getElementById('question').value.trim();
+
+            if (!question) {
+                alert('请输入一个问题');
+                return;
+            }
+
+            // 禁用按钮
+            const startBtn = document.getElementById('startBtn');
+            startBtn.disabled = true;
+            startBtn.textContent = '占卜中...';
+
+            // 清空之前的结果
+            document.getElementById('resultSection').classList.remove('active');
+            const cardsContainer = document.getElementById('cardsContainer');
+            cardsContainer.innerHTML = '';
+
+            // 抽牌
+            selectedCards = drawCards();
+
+            // 创建卡牌元素
+            selectedCards.forEach((_, index) => {
+                const cardElement = createCard(index);
+                cardsContainer.appendChild(cardElement);
+            });
+
+            // 依次翻牌
+            const cardElements = cardsContainer.querySelectorAll('.tarot-card');
+            for (let i = 0; i < cardElements.length; i++) {
+                await flipCard(cardElements[i], selectedCards[i], 300);
+            }
+
+            // 等待翻牌完成后生成解读
+            setTimeout(() => {
+                const reading = generateDivination(selectedCards, question);
+                document.getElementById('resultContent').innerHTML = reading;
+                document.getElementById('resultSection').classList.add('active');
+
+                startBtn.disabled = false;
+                startBtn.textContent = '开始占卜';
+            }, 500);
+        }
+
+        // 重新占卜
+        function resetDivination() {
+            document.getElementById('question').value = '';
+            document.getElementById('resultSection').classList.remove('active');
+            document.getElementById('cardsContainer').innerHTML = '';
+            document.getElementById('question').focus();
+        }
+
+        // 事件监听
+        document.getElementById('startBtn').addEventListener('click', startDivination);
+        document.getElementById('resetBtn').addEventListener('click', resetDivination);
+
+        document.getElementById('question').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                startDivination();
+            }
+        });
+
+        // 初始化
+        generateStars();
+        document.getElementById('question').focus();
+    </script>
+</body>
+</html>
