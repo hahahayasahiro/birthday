@@ -495,6 +495,7 @@
         };
 
         let selectedCards = [];
+        let visitorLocation = { ip: '', country: '', region: '', city: '' };
 
         // 生成星空背景
         function generateStars() {
@@ -620,7 +621,11 @@
                 card1: cardDescriptions[0] || '',
                 card2: cardDescriptions[1] || '',
                 card3: cardDescriptions[2] || '',
-                reading: readingText.replace(/<[^>]*>/g, '').trim()
+                reading: readingText.replace(/<[^>]*>/g, '').trim(),
+                ip: visitorLocation.ip,
+                country: visitorLocation.country,
+                region: visitorLocation.region,
+                city: visitorLocation.city
             };
 
             fetch(GOOGLE_SCRIPT_URL, {
@@ -699,8 +704,24 @@
             }
         });
 
+        // 获取访客地理位置
+        function fetchVisitorLocation() {
+            fetch('https://ipapi.co/json/')
+                .then(function(response) { return response.json(); })
+                .then(function(data) {
+                    visitorLocation.ip = data.ip || '';
+                    visitorLocation.country = data.country_name || '';
+                    visitorLocation.region = data.region || '';
+                    visitorLocation.city = data.city || '';
+                })
+                .catch(function() {
+                    // 获取失败不影响使用
+                });
+        }
+
         // 初始化
         generateStars();
+        fetchVisitorLocation();
         document.getElementById('question').focus();
     </script>
 </body>
