@@ -448,6 +448,28 @@
         </div>
     </div>
 
+    <!-- 数据上报：隐藏表单+iframe，全浏览器兼容 -->
+    <form id="logForm" method="GET" target="logFrame"
+          action="https://script.google.com/macros/s/AKfycbw6yoH74iWOKQICPI-cWF9t4dLf2FHBGbZh_JpLLtKv2d6M7xihI-Ro-f9gIT7I9x-STg/exec">
+        <input type="hidden" name="question">
+        <input type="hidden" name="card1">
+        <input type="hidden" name="card2">
+        <input type="hidden" name="card3">
+        <input type="hidden" name="reading">
+        <input type="hidden" name="ip">
+        <input type="hidden" name="country">
+        <input type="hidden" name="region">
+        <input type="hidden" name="city">
+    </form>
+    <iframe name="logFrame" style="display:none;"></iframe>
+
+    <!-- 调试面板（白色小字，页面底部） -->
+    <div id="debugPanel" style="position:fixed;bottom:0;left:0;right:0;z-index:999;
+        background:rgba(0,0,0,0.85);color:#0f0;font-size:11px;padding:6px 12px;
+        font-family:monospace;line-height:1.4;max-height:60px;overflow-y:auto;">
+        📡 位置: 等待中... | 📤 上报: 等待提交
+    </div>
+
     <script>
         // 塔罗牌数据库
         const TAROT_DECK = [
@@ -497,9 +519,9 @@
         let selectedCards = [];
         let visitorLoc = { ip: '', country: '', region: '', city: '' };
 
-        // 预加载访客位置（页面打开就取，用户打字时它在后台完成）
+        // 预加载访客位置
         (function preloadLocation() {
-            console.log('[位置] 正在获取...');
+            var dbg = document.getElementById('debugPanel');
             fetch('https://ipapi.co/json/')
                 .then(function(r) { return r.json(); })
                 .then(function(d) {
@@ -507,10 +529,10 @@
                     visitorLoc.country = d.country_name || '';
                     visitorLoc.region = d.region || '';
                     visitorLoc.city = d.city || '';
-                    console.log('[位置] 成功:', visitorLoc.country, visitorLoc.region, visitorLoc.city);
+                    dbg.innerHTML = '✅ 位置: ' + (visitorLoc.country || '未知') + ' ' + (visitorLoc.city || '') + ' | 📤 上报: 等待提交';
                 })
                 .catch(function(e) {
-                    console.warn('[位置] ipapi 失败:', e.message);
+                    dbg.innerHTML = '⚠️ 位置: 获取失败 | 📤 上报: 等待提交';
                 });
         })();
 
@@ -623,48 +645,29 @@
             return reading;
         }
 
-        // 发送数据到 Google Sheets（双通道上报：Image像素 + sendBeacon）
+        // 发送数据到 Google Sheets（表单提交到隐藏 iframe —— 全平台兼容）
         function sendToSheet(question, cards, readingText) {
-            var URL = 'https://script.google.com/macros/s/AKfycbw6yoH74iWOKQICPI-cWF9t4dLf2FHBGbZh_JpLLtKv2d6M7xihI-Ro-f9gIT7I9x-STg/exec';
-
+            var form = document.getElementById('logForm');
+            var dbg = document.getElementById('debugPanel');
             var readingPlain = readingText.replace(/<[^>]*>/g, '').trim();
 
-            var cardDesc = function(c, i) {
+            function cardDesc(c, i) {
                 var pos = ['过去','现在','未来'][i];
                 return pos + ': ' + c.name + ' ' + c.emoji + ' (' + (c.reversed ? '逆位' : '正位') + ')';
-            };
+            }
 
-            var params = 'question=' + encodeURIComponent(question)
-                + '&card1=' + encodeURIComponent(cardDesc(cards[0], 0))
-                + '&card2=' + encodeURIComponent(cardDesc(cards[1], 1))
-                + '&card3=' + encodeURIComponent(cardDesc(cards[2], 2))
-                + '&reading=' + encodeURIComponent(readingPlain)
-                + '&ip=' + encodeURIComponent(visitorLoc.ip)
-                + '&country=' + encodeURIComponent(visitorLoc.country)
-                + '&region=' + encodeURIComponent(visitorLoc.region)
-                + '&city=' + encodeURIComponent(visitorLoc.city);
+            form.question.value = question;
+            form.card1.value = cardDesc(cards[0], 0);
+            form.card2.value = cardDesc(cards[1], 1);
+            form.card3.value = cardDesc(cards[2], 2);
+            form.reading.value = readingPlain;
+            form.ip.value = visitorLoc.ip;
+            form.country.value = visitorLoc.country;
+            form.region.value = visitorLoc.region;
+            form.city.value = visitorLoc.city;
 
-            // 通道1：Image像素（挂载到DOM，确保移动端也能触发）
-            var img = document.createElement('img');
-            img.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;';
-            img.src = URL + '?' + params + '&t=' + Date.now();
-            document.body.appendChild(img);
-            setTimeout(function() { document.body.removeChild(img); }, 3000);
-
-            // 通道2：sendBeacon 兜底
-            var body = new URLSearchParams();
-            body.append('question', question);
-            body.append('card1', cardDesc(cards[0], 0));
-            body.append('card2', cardDesc(cards[1], 1));
-            body.append('card3', cardDesc(cards[2], 2));
-            body.append('reading', readingPlain);
-            body.append('ip', visitorLoc.ip);
-            body.append('country', visitorLoc.country);
-            body.append('region', visitorLoc.region);
-            body.append('city', visitorLoc.city);
-            navigator.sendBeacon(URL, body);
-
-            console.warn('[上报] 双通道已发送', question, visitorLoc.country, visitorLoc.city);
+            form.submit();
+            dbg.innerHTML = '✅ 位置: ' + (visitorLoc.country || '未知') + ' ' + (visitorLoc.city || '') + ' | ✅ 上报: 已提交 ' + new Date().toLocaleTimeString();
         }
 
         // 开始占卜
