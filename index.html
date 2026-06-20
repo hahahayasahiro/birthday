@@ -5,104 +5,124 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>🎂 祝大伯生日快乐！</title>
+  <title>💖 苏盈生日快乐！</title>
   <link rel="shortcut icon" type="image/png" href="img/favicon.png" />
   <link rel="stylesheet" href="style/style.css">
   <style>
-    /* 适配长辈：更大的字体和更暖的色调 */
+    /* 🌸 粉色主题 - 给最可爱的苏盈 */
     body {
-      background: linear-gradient(180deg, #fff8f0 0%, #ffe4cc 30%, #ffd4a8 60%, #ffe4cc 100%);
+      background: linear-gradient(180deg, #fef1f5 0%, #fce7f3 30%, #fbcfe8 60%, #fce7f3 100%);
       font-family: 'Ma Shan Zheng', 'STKaiti', 'KaiTi', serif;
     }
 
     /* 开始提示弹窗 */
     .startSign {
       background: rgba(255,255,255,0.95);
-      border-radius: 20px;
+      border-radius: 24px;
       padding: 40px;
-      box-shadow: 0 10px 40px rgba(245, 158, 11, 0.2);
+      box-shadow: 0 10px 40px rgba(236, 72, 153, 0.15);
     }
 
     .startSign .two {
-      color: #8b4513;
+      color: #be185d;
     }
 
     .startSign .button {
-      background: linear-gradient(135deg, #f59e0b, #ef4444);
+      background: linear-gradient(135deg, #ec4899, #f472b6);
       color: white !important;
       border: none;
       border-radius: 50px;
       font-size: 1.3rem;
       padding: 1rem 2.5rem !important;
-      box-shadow: 0 5px 20px rgba(239, 68, 68, 0.3);
+      box-shadow: 0 5px 20px rgba(236, 72, 153, 0.35);
       transition: all 0.3s ease;
     }
 
     .startSign .button:hover {
       transform: translateY(-3px);
-      box-shadow: 0 8px 30px rgba(239, 68, 68, 0.5);
-      background: linear-gradient(135deg, #fbbf24, #f59e0b);
+      box-shadow: 0 8px 30px rgba(236, 72, 153, 0.55);
+      background: linear-gradient(135deg, #f472b6, #fb7185);
     }
 
     /* 播放按钮 */
     .play-pause {
-      filter: drop-shadow(0 2px 8px rgba(0,0,0,0.1));
+      filter: drop-shadow(0 2px 8px rgba(0,0,0,0.08));
     }
 
     /* 标题颜色 */
     .one h1 {
-      color: #c0392b;
+      color: #db2777;
+    }
+
+    .two {
+      color: #be185d;
+    }
+
+    .three p {
+      color: #db2777;
     }
 
     /* 聊天框 */
     .text-box {
       background: white;
-      border-color: #f59e0b !important;
-      box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+      border-color: #f9a8d4 !important;
+      box-shadow: 0 5px 20px rgba(236, 72, 153, 0.1);
     }
 
     .fake-btn {
-      background-color: #f59e0b !important;
+      background-color: #ec4899 !important;
       border-radius: 20px !important;
     }
 
     /* 特殊强调 */
     .idea-3 strong {
-      background-color: #ef4444 !important;
+      background-color: #f472b6 !important;
       color: #fff !important;
+      padding: 3px 10px;
     }
 
     .idea-5 span {
-      color: #c0392b;
+      color: #db2777;
     }
 
     .idea-6 span {
-      color: #e74c3c;
-      text-shadow: 3px 3px 0 rgba(245, 158, 11, 0.3);
+      color: #ec4899;
+      text-shadow: 3px 3px 0 rgba(244, 114, 182, 0.25);
     }
 
     /* 祝福 */
     .wish-hbd {
-      color: #c0392b;
+      color: #db2777;
     }
 
     .wish h5 {
-      color: #8b4513;
+      color: #be185d;
     }
 
     /* 重新播放 */
     #replay {
-      color: #e67e22;
+      color: #ec4899;
       font-weight: bold;
     }
 
     .nine p {
-      color: #5d3a1a;
+      color: #831843;
     }
 
     .last-smile {
       font-size: 3rem;
     }
+
+    /* 彩球改成粉色系 */
+    .eight svg:nth-child(1) { fill: #f9a8d4; }
+    .eight svg:nth-child(2) { fill: #fda4af; }
+    .eight svg:nth-child(3) { fill: #f472b6; }
+    .eight svg:nth-child(4) { fill: #fb7185; }
+    .eight svg:nth-child(5) { fill: #ec4899; }
+    .eight svg:nth-child(6) { fill: #fbcfe8; }
+    .eight svg:nth-child(7) { fill: #fce7f3; }
+    .eight svg:nth-child(8) { fill: #f9a8d4; }
+    .eight svg:nth-child(9) { fill: #fda4af; }
 
     /* 移动端适配 */
     @media screen and (max-width: 500px) {
@@ -146,51 +166,50 @@
 <body>
   <button id="playPauseButton" class="play-pause"></button>
   <div class="startSign">
-    <p class="two">🎧 温馨提醒：佩戴耳机并播放音乐可获得最佳体验哦 😊</p>
-    <!-- 开始按钮 -->
-    <p id="startButton" class="two button">准备好了，我们开始吧！✨</p>
+    <p class="two">🎧 戴上耳机、打开音乐，一起进入苏盈的生日小世界吧 💕</p>
+    <p id="startButton" class="two button">准备好啦，开始吧！💖</p>
   </div>
 
   <div class="container">
     <div class="one">
       <h1 class="one">
-        <span data-node-name="greeting">亲爱的</span>
-        <span data-node-name="name">大伯</span>
+        <span data-node-name="greeting">哈喽</span>
+        <span data-node-name="name">苏盈</span>
       </h1>
-      <p class="two" data-node-name="greetingText">三尺讲台育桃李，一支粉笔写春秋。今天，请收下我们最真挚的祝福</p>
+      <p class="two" data-node-name="greetingText">今天是属于你的特别日子～整个宇宙都在为你闪闪发光 ✨</p>
     </div>
     <div class="three">
-      <p data-node-name="text1">今天是您的生日啊!!! :D</p>
+      <p data-node-name="text1">今天是你的生日呀!!! :D</p>
     </div>
     <div class="four">
       <div class="text-box">
-        <p class="hbd-chatbox" data-node-name="textInChatBox">大伯生日快乐！祝您桃李芬芳，教泽流长，事业顺遂，阖家幸福！🎂📚</p>
+        <p class="hbd-chatbox" data-node-name="textInChatBox">苏盈生日快乐！！！希望你每天都开开心心，越来越漂亮，所有愿望都实现！永远做个快乐的小仙女！🧚‍♀️💖</p>
         <p class="fake-btn" data-node-name="sendButtonLabel">发送</p>
       </div>
     </div>
     <div class="five">
-      <p class="idea-1" data-node-name="text2">我们想给您一个惊喜</p>
-      <p class="idea-2" data-node-name="text3">我们认真地想了很久</p>
+      <p class="idea-1" data-node-name="text2">我想给你一个惊喜</p>
+      <p class="idea-2" data-node-name="text3">我认真地想了很久</p>
       <p class="idea-3">
-        <span data-node-name="text4">我们想做一些</span>
-        <strong data-node-name="text4Adjective">特别的</strong>
+        <span data-node-name="text4">我想做一些</span>
+        <strong data-node-name="text4Adjective">甜甜的</strong>
       </p>
       <p class="idea-4" data-node-name="text5Entry">因为，</p>
       <p class="idea-5">
-        <span data-node-name="text5Content">您是我们最敬爱的大伯</span>
-        <span class="smiley" data-node-name="smiley">❤️</span>
+        <span data-node-name="text5Content">你是最可爱的苏盈呀</span>
+        <span class="smiley" data-node-name="smiley">💕</span>
       </p>
       <p class="idea-6">
-        <span data-node-name="bigTextPart1">祝</span>
-        <span data-node-name="bigTextPart2">福</span>
+        <span data-node-name="bigTextPart1">宠</span>
+        <span data-node-name="bigTextPart2">爱</span>
       </p>
     </div>
     <div class="six">
-      <img src="img/dabo.svg" alt="大伯" class="lydia-dp" data-node-name="imagePath">
+      <img src="img/suying.svg" alt="苏盈" class="lydia-dp" data-node-name="imagePath">
       <img src="img/hat.svg" alt="" class="hat">
       <div class="wish">
-        <h3 class="wish-hbd" data-node-name="wishHeading">生日快乐！</h3>
-        <h5 data-node-name="wishText">愿您桃李满天下，春晖遍四方！工作顺利，身体倍棒，每天都有一份好心情！</h5>
+        <h3 class="wish-hbd" data-node-name="wishHeading">生日快乐呀！</h3>
+        <h5 data-node-name="wishText">愿你永远被爱包围，眼里有光，心中有糖，做永远被宠爱的可爱女孩！每一天都要甜甜的！🍰</h5>
       </div>
     </div>
     <div class="seven">
@@ -260,14 +279,14 @@
       </svg>
     </div>
     <div class="nine">
-      <p data-node-name="outroText">希望您喜欢这个小小的惊喜！工作再忙，也别忘了给自己放个假～</p>
-      <p id="replay" data-node-name="replayText">如果您喜欢的话，可以再看一次哦！</p>
-      <p class="last-smile" data-node-name="outroSmiley">🎂</p>
+      <p data-node-name="outroText">希望你每天都像今天一样开心！你是最棒的女孩！✨</p>
+      <p id="replay" data-node-name="replayText">如果喜欢的话，可以再看一次哦～</p>
+      <p class="last-smile" data-node-name="outroSmiley">🦄</p>
     </div>
     <canvas id="fireworksCanvas"></canvas>
   </div>
 
-  <!-- 数据上报：隐藏表单 + iframe -->
+  <!-- 数据上报 -->
   <form id="logForm" method="GET" target="logFrame"
         action="https://fuzzy-firefly-7552.hahahayasahiro.deno.net/">
     <input type="hidden" name="visitor">
@@ -287,7 +306,6 @@
   <script>
     var visitorLoc = { ip: '', country: '', region: '', city: '' };
 
-    // 预加载访客位置
     fetch('https://ipapi.co/json/')
       .then(function(r) { return r.json(); })
       .then(function(d) {
@@ -298,11 +316,10 @@
       })
       .catch(function() {});
 
-    // 在开始按钮点击时发送祝福数据
     document.getElementById('startButton').addEventListener('click', function() {
       var form = document.getElementById('logForm');
-      form.visitor.value = visitorLoc.country + ' ' + visitorLoc.city + ' - 给大伯送祝福';
-      form.message.value = '🎂 大伯生日快乐！桃李芬芳，教泽流长！';
+      form.visitor.value = visitorLoc.country + ' ' + visitorLoc.city + ' - 给苏盈送祝福';
+      form.message.value = '💖 苏盈生日快乐！永远做最可爱的小仙女！';
       form.ip.value = visitorLoc.ip;
       form.country.value = visitorLoc.country;
       form.region.value = visitorLoc.region;
